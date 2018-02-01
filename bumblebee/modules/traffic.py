@@ -92,7 +92,7 @@ class Module(bumblebee.engine.Module):
 
             for direction in ["rx", "tx"]:
                 name = "traffic.{}-{}".format(direction, interface)
-                widget = self.create_widget(widgets, name, attributes={"theme.minwidth": "1000.00MB"})
+                widget = self.create_widget(widgets, name, attributes={"theme.minwidth": "100.00MB"})
                 prev = self._prev.get(name, 0)
                 speed = bumblebee.util.bytefmt(int(data[direction]) - int(prev))
                 widget.full_text(speed)

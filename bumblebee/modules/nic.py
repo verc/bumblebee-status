@@ -91,7 +91,8 @@ class Module(bumblebee.engine.Module):
             if not widget:
                 widget = bumblebee.output.Widget(name=intf)
                 widgets.append(widget)
-            widget.full_text("{} {} {}".format(intf, state, ", ".join(addr)))
+            #widget.full_text("{} {} {}".format(intf, state, ", ".join(addr)))
+            widget.full_text(", ".join(addr))
             widget.set("intf", intf)
             widget.set("state", state)
             widget.set("visited", True)
