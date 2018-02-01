@@ -29,9 +29,7 @@ class Module(bumblebee.engine.Module):
         )
         self._curprice = ""
         self._nextcheck = 0
-        self._interval = int(self.parameter("interval", "120"))
-        self.tokens = ','.join([ tok.upper() for tok in self.parameter("tokens", "eth,btc").split(',') ])
-        self.currency = self.parameter("currency", "usd").upper()
+        self._interval = int(self.parameter("interval", "30"))
 
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
             cmd="xdg-open https://www.livecoinwatch.com/")
@@ -43,11 +41,10 @@ class Module(bumblebee.engine.Module):
         if self._nextcheck < int(time.time()):
             self._nextcheck = int(time.time()) + self._interval
             try:
-             r = requests.get('https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s' % (self.tokens,self.currency),timeout=5).json()
+              eth = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/?convert=USD',timeout=5).json()[0]
+              btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/?convert=USD',timeout=5).json()[0]
             except:
               self.text = "unable to update prices"
             else:
-              self.text = ""
-              for tok in self.tokens.split(','):
-                self.text += tok + ' ' + str(r['RAW'][tok][self.currency]['PRICE']) + '  '
+              self.text = "Ξ %.2f Ƀ %.2f 🐬 %.2f%%" % (float(eth['price_usd']),float(btc['price_usd']),100. * float(eth['market_cap_usd']) / float(btc['market_cap_usd']))
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
