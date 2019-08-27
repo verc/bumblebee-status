@@ -47,7 +47,7 @@ class Module(bumblebee.engine.Module):
         self.text = '⚫'
 
         self._nextcheck = 0
-        self._interval = int(self.parameter("interval", "2"))
+        self._interval = int(self.parameter("interval", "3"))
 
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
             cmd=self.click)
