@@ -4,7 +4,7 @@
 """Hue light control and notification
 
 Requires the following python packages:
-    * requests
+    * phue
 
 Parameters:
     * hue.bridge: IP of Hue bridge.
