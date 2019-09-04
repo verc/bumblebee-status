@@ -44,10 +44,13 @@ class Module(bumblebee.engine.Module):
 
         self.group = Group(self.bridge, int(id))
         self.brightness = self.group.brightness - self.group.brightness % 5
+        self.original_brightness = self.group.brightness
         self.text = '⚫'
 
         self._nextcheck = 0
-        self._interval = int(self.parameter("interval", "3"))
+        self._state_time = 0
+        self.on = self.group.on
+        self._interval = int(self.parameter("interval", "1"))
 
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
             cmd=self.click)
@@ -59,28 +62,39 @@ class Module(bumblebee.engine.Module):
                                        cmd=self.decrease_brightness)
 
     def click(self, e=None):
-      self.group.on = not self.group.on
+      self.group.on = self.on = not self.group.on
+      self._state_time = int(time.time()) + 1
 
     def increase_brightness(self, e=None):
       self.brightness += 5
-      self.brightness = min(self.brightness, 100)
       self.text = "%d%%" % self.brightness
+      self._nextcheck = int(time.time()) + self._interval
 
     def decrease_brightness(self, e=None):
       self.brightness -= 5
-      self.brightness = max(self.brightness, 0)
       self.text = "%d%%" % self.brightness
+      self._nextcheck = int(time.time()) + self._interval
 
     def make(self, widget):
       return self.text.strip()
 
     def state(self, widget):
-      if not self.group.on:
+      if self._state_time < int(time.time()):
+        self._state_time = int(time.time()) + 1
+        self.on = self.group.on
+      if not self.on:
         return ["warning"]
       return ["default"]
 
     def update(self, widgets):
-      if self._nextcheck < int(time.time()):
+      if self._nextcheck < int(time.time()) and self.text != '⚫':
         self._nextcheck = int(time.time()) + self._interval
-        self.group.brightness = self.brightness
+        group_brightness = self.group.brightness
+        if self.brightness != group_brightness:
+          if self.original_brightness == group_brightness:
+            self.group.brightness = self.brightness
+            self.original_brightness = self.brightness
+          else:
+            self.brightness = group_brightness
+            self.original_brightness = group_brightness
         self.text = '⚫'
