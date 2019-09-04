@@ -28,12 +28,14 @@ class Module(bumblebee.engine.Module):
         super(Module, self).__init__(engine, config,
             bumblebee.output.Widget(full_text=self.make)
         )
-        try:
-          self.bridge = Bridge(self.parameter("bridge", ""))
-          self.bridge.connect()
-        except:
-          self.text = "error: could not connect to bridge at: " + self.parameter("bridge", "")
-          return
+        while True:
+          try:
+            self.bridge = Bridge(self.parameter("bridge", ""))
+            self.bridge.connect()
+            break
+          except:
+            self.text = "error: could not connect to bridge at: " + self.parameter("bridge", "")
+            time.sleep(1)
 
         for id,group in self.bridge.get_group().items():
           if group['name'] == self.parameter("group", ""):
