@@ -58,7 +58,7 @@ class Module(bumblebee.engine.Module):
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
             cmd=self.click)
         engine.input.register_callback(self, button=bumblebee.input.RIGHT_MOUSE,
-                                       cmd=self.parameter("action", "luminance"))
+                                       cmd=self.parameter("action", "google-chrome http://192.168.178.23:8523/"))
         engine.input.register_callback(self, button=bumblebee.input.WHEEL_UP,
                                        cmd=self.increase_brightness)
         engine.input.register_callback(self, button=bumblebee.input.WHEEL_DOWN,
@@ -73,13 +73,13 @@ class Module(bumblebee.engine.Module):
 
     def increase_brightness(self, e=None):
       self.brightness += 5
-      self.text = "%d%%" % self.brightness
+      self.text = "  %d%%" % self.brightness
       self.modify_brightness = True
       self._nextcheck = int(time.time()) + self._interval
 
     def decrease_brightness(self, e=None):
       self.brightness -= 5
-      self.text = "%d%%" % self.brightness
+      self.text = " %d%%" % self.brightness
       self.modify_brightness = True
       self._nextcheck = int(time.time()) + self._interval
 
@@ -119,4 +119,4 @@ class Module(bumblebee.engine.Module):
                 'temperature': api[str(int(s) + 2)]['state']
               }
               break
-          self.text = "%.2f°" % (float(sensors['temperature']['temperature'])/100,)
+          self.text = "%.1f°" % (float(sensors['temperature']['temperature'])/100,)
