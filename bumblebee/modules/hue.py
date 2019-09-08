@@ -58,7 +58,7 @@ class Module(bumblebee.engine.Module):
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
             cmd=self.click)
         engine.input.register_callback(self, button=bumblebee.input.RIGHT_MOUSE,
-                                       cmd=self.parameter("action", "google-chrome http://192.168.178.23:8523/"))
+                                       cmd=self.parameter("action", "luminance"))
         engine.input.register_callback(self, button=bumblebee.input.WHEEL_UP,
                                        cmd=self.increase_brightness)
         engine.input.register_callback(self, button=bumblebee.input.WHEEL_DOWN,
@@ -97,26 +97,33 @@ class Module(bumblebee.engine.Module):
     def update(self, widgets):
       if self._nextcheck < int(time.time()) and self.modify_brightness:
         self._nextcheck = int(time.time()) + self._interval
-        group_brightness = self.group.brightness
-        if self.brightness != group_brightness:
-          if self.original_brightness == group_brightness:
-            self.group.brightness = self.brightness
-            self.original_brightness = self.brightness
-          else:
-            self.brightness = group_brightness
-            self.original_brightness = group_brightness
-        self.modify_brightness = False
+        try:
+          group_brightness = self.group.brightness
+          if self.brightness != group_brightness:
+            if self.original_brightness == group_brightness:
+              self.group.brightness = self.brightness
+              self.original_brightness = self.brightness
+            else:
+              self.brightness = group_brightness
+              self.original_brightness = group_brightness
+          self.modify_brightness = False
+          self._tempcheck = int(time.time()) + 5
+        except:
+          self.text = "brightness error"
       if self._tempcheck < int(time.time()):
-        self._tempcheck = int(time.time()) + 10
-        if self.parameter("sensor", ""):
-          api = self.bridge.get_api()['sensors']
-          sensors = {}
-          for s in api:
-            if api[s].get('productname', '') == 'Hue motion sensor' and api[s]['name'] == self.parameter("sensor", ""):
-              sensors = {
-                'motion': api[str(int(s) + 0)]['state'],
-                'light': api[str(int(s) + 1)]['state'],
-                'temperature': api[str(int(s) + 2)]['state']
-              }
-              break
-          self.text = "%.1f°" % (float(sensors['temperature']['temperature'])/100,)
+        self._tempcheck = int(time.time()) + 5
+        try:
+          if self.parameter("sensor", ""):
+            api = self.bridge.get_api()['sensors']
+            sensors = {}
+            for s in api:
+              if api[s].get('productname', '') == 'Hue motion sensor' and api[s]['name'] == self.parameter("sensor", ""):
+                sensors = {
+                  'motion': api[str(int(s) + 0)]['state'],
+                  'light': api[str(int(s) + 1)]['state'],
+                  'temperature': api[str(int(s) + 2)]['state']
+                }
+                break
+            self.text = "%.1f°" % (float(sensors['temperature']['temperature'])/100,)
+        except:
+          self.text = "temperature error"
