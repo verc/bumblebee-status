@@ -72,14 +72,16 @@ class Module(bumblebee.engine.Module):
       self._statecheck = int(time.time()) + 1
 
     def increase_brightness(self, e=None):
+      if self.brightness >= 255: return
       self.brightness += 5
-      self.text = "  %d%%" % self.brightness
+      self.text = " %d%%" % (100 * (self.brightness / 255.), )
       self.modify_brightness = True
       self._nextcheck = int(time.time()) + self._interval
 
     def decrease_brightness(self, e=None):
+      if self.brightness <= 0: return
       self.brightness -= 5
-      self.text = " %d%%" % self.brightness
+      self.text = " %d%%" % (100 * (self.brightness / 255.), )
       self.modify_brightness = True
       self._nextcheck = int(time.time()) + self._interval
 
