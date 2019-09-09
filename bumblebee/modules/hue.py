@@ -21,6 +21,7 @@ import bumblebee.util
 import bumblebee.input
 import bumblebee.output
 import bumblebee.engine
+import i3
 from phue import Bridge, Group
 
 class Module(bumblebee.engine.Module):
@@ -44,6 +45,8 @@ class Module(bumblebee.engine.Module):
           self.text = "error: unknown group: " + self.parameter("group", "")
           return
 
+        i3.Subscription(self.i3sub, 'workspace')
+
         self.group = Group(self.bridge, int(id))
         self.brightness = self.group.brightness - self.group.brightness % 5
         self.original_brightness = self.group.brightness
@@ -66,6 +69,15 @@ class Module(bumblebee.engine.Module):
 
         self.text = "%d%%" % self.brightness
         self.update(None)
+
+    def i3sub(self, event, data, subscription):
+      if event['change'] == 'urgent':
+        for node in event['current']['floating_nodes'][0]['nodes']:
+          if node['name'] == 'Signal':
+            if node['urgent']:
+              self.group.on = False
+            else:
+              self.group.on = True
 
     def click(self, e=None):
       self.group.on = self.on = not self.group.on
@@ -91,7 +103,10 @@ class Module(bumblebee.engine.Module):
     def state(self, widget):
       if self._statecheck < int(time.time()):
         self._statecheck = int(time.time()) + 1
-        self.on = self.group.on
+        try:
+          self.on = self.group.on
+        except:
+          self.text = "state error"
       if not self.on:
         return ["warning"]
       return ["default"]
