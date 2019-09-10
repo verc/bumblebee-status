@@ -5,8 +5,11 @@ import json
 import uuid
 import time
 import select
+import logging
 import threading
 import bumblebee.util
+
+log = logging.getLogger(__name__)
 
 LEFT_MOUSE = 1
 MIDDLE_MOUSE = 2
@@ -22,30 +25,34 @@ def is_terminated():
 
 def read_input(inp):
     """Read i3bar input and execute callbacks"""
-    epoll = select.epoll()
-    epoll.register(sys.stdin.fileno(), select.EPOLLIN)
+    poll = select.poll()
+    poll.register(sys.stdin.fileno(), select.POLLIN)
+    log.debug("starting click event processing")
     while inp.running:
         if is_terminated():
             return
 
         try:
-            events = epoll.poll(1)
+            events = poll.poll(1000)
         except Exception:
             continue
         for fileno, event in events:
             line = "["
-            while "[" in line:
+            while line.startswith("["):
                 line = sys.stdin.readline().strip(",").strip()
+                log.debug("new event: {}".format(line))
             inp.has_event = True
             try:
                 event = json.loads(line)
                 if "instance" in event:
                     inp.callback(event)
                     inp.redraw()
-            except ValueError:
-                pass
-    epoll.unregister(sys.stdin.fileno())
-    epoll.close()
+                else:
+                    log.debug("field 'instance' missing in input, not processing the event")
+            except ValueError as e:
+                log.debug("failed to parse event: {}".format(e))
+    log.debug("exiting click event processing")
+    poll.unregister(sys.stdin.fileno())
     inp.has_event = True
     inp.clean_exit = True
 

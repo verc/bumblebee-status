@@ -11,7 +11,10 @@ import bumblebee.input
 import bumblebee.output
 import bumblebee.engine
 
-from taskw import TaskWarrior
+try:
+    from taskw import TaskWarrior
+except:
+    pass
 
 
 class Module(bumblebee.engine.Module):
@@ -35,5 +38,5 @@ class Module(bumblebee.engine.Module):
             self._pending_tasks_count = 'Error'
 
     def output(self, _):
-        """Format the task counter to ouptut in bumblebee."""
+        """Format the task counter to output in bumblebee."""
         return "{}".format(self._pending_tasks_count)

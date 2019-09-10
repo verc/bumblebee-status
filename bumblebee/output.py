@@ -17,14 +17,30 @@ def scrollable(func):
         if len(text) <= width:
             return text
         # we need to shorten
+        
+        try:
+            bounce = int(module.parameter("scrolling.bounce", 1))
+        except ValueError:
+            bounce = 1
+        try:
+            scroll_speed = int(module.parameter("scrolling.speed", 1))
+        except ValueError:
+            scroll_speed = 1
         start = widget.get("scrolling.start", -1)
         direction = widget.get("scrolling.direction", "right")
-        start += 1 if direction == "right" else -1
+        start += scroll_speed if direction == "right" else -(scroll_speed)
+        
+        if width + start > len(text) + (scroll_speed -1):
+            if bounce:
+                widget.set("scrolling.direction", "left")
+            else:
+                start = 0
+        elif start <= 0:
+            if bounce:
+                widget.set("scrolling.direction", "right")
+            else:
+                start = len(text)
         widget.set("scrolling.start", start)
-        if width + start >= len(text):
-            widget.set("scrolling.direction", "left")
-        if start <= 0:
-            widget.set("scrolling.direction", "right")
         text = text[start:width+start]
 
         return text
@@ -37,11 +53,15 @@ class Widget(bumblebee.store.Store):
         self._full_text = full_text
         self.module = None
         self._module = None
+        self._minimized = False
         self.name = name
         self.id = str(uuid.uuid4())
 
     def get_module(self):
         return self._module
+
+    def toggle_minimize(self):
+        self._minimized = not self._minimized
 
     def link_module(self, module):
         """Set the module that spawned this widget
@@ -70,6 +90,8 @@ class Widget(bumblebee.store.Store):
         if value:
             self._full_text = value
         else:
+            if self._minimized:
+                return u"\u2026"
             if callable(self._full_text):
                 return self._full_text(self)
             else:
@@ -77,10 +99,11 @@ class Widget(bumblebee.store.Store):
 
 class I3BarOutput(object):
     """Manage output according to the i3bar protocol"""
-    def __init__(self, theme):
+    def __init__(self, theme, config=None):
         self._theme = theme
         self._widgets = []
         self._started = False
+        self._config = config
 
     def started(self):
         return self._started
@@ -99,13 +122,18 @@ class I3BarOutput(object):
         full_text = widget.full_text()
         if widget.get_module() and widget.get_module().hidden():
             return
+        if widget.get_module() and widget.get_module().name in self._config.autohide():
+            if not any(state in widget.state() for state in ["warning", "critical"]):
+                return
         padding = self._theme.padding(widget)
         prefix = self._theme.prefix(widget, padding)
         suffix = self._theme.suffix(widget, padding)
+
         if prefix:
             full_text = u"{}{}".format(prefix, full_text)
         if suffix:
             full_text = u"{}{}".format(full_text, suffix)
+
         separator = self._theme.separator(widget)
         if separator:
             self._widgets.append({
@@ -116,13 +144,18 @@ class I3BarOutput(object):
                 "separator_block_width": self._theme.separator_block_width(widget),
             })
         width = self._theme.minwidth(widget)
+
+        if width:
+            full_text = full_text.ljust(len(width) + len(prefix) + len(suffix))
+
         self._widgets.append({
             u"full_text": full_text,
             "color": self._theme.fg(widget),
             "background": self._theme.bg(widget),
             "separator_block_width": self._theme.separator_block_width(widget),
             "separator": True if separator is None else False,
-            "min_width": width + "A"*(len(prefix) + len(suffix)) if width else None,
+            "min_width": None,
+#            "min_width": width + "A"*(len(prefix) + len(suffix)) if width else None,
             "align": self._theme.align(widget),
             "instance": widget.id,
             "name": module.id,
@@ -135,7 +168,10 @@ class I3BarOutput(object):
 
     def flush(self):
         """Flushes output"""
-        sys.stdout.write(json.dumps(self._widgets))
+        widgets = self._widgets
+        if self._config and self._config.reverse():
+            widgets = list(reversed(widgets))
+        sys.stdout.write(json.dumps(widgets))
 
     def end(self):
         """Finalizes output"""

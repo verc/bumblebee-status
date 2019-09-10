@@ -6,7 +6,6 @@ import os
 import glob
 import copy
 import json
-import yaml
 import io
 import re
 import logging
@@ -39,12 +38,13 @@ def themes():
 
 class Theme(object):
     """Represents a collection of icons and colors"""
-    def __init__(self, name):
+    def __init__(self, name, iconset="auto"):
         self._widget = None
         self._cycle_idx = 0
         self._cycle = {}
         self._prevbg = None
         self._colorset = {}
+        self._iconset = iconset
 
         self.load_symbols()
 
@@ -78,8 +78,11 @@ class Theme(object):
     def _init(self, data):
         """Initialize theme from data structure"""
         self._theme = data
-        for iconset in data.get("icons", []):
-            self._merge(data, self._load_icons(iconset))
+        if self._iconset != "auto":
+            self._merge(data, self._load_icons(self._iconset))
+        else:
+            for iconset in data.get("icons", []):
+                self._merge(data, self._load_icons(iconset))
         for colorset in data.get("colors", []):
             self._merge(self._colorset, self._load_colors(colorset))
         self._defaults = data.get("defaults", {})
@@ -97,6 +100,14 @@ class Theme(object):
         self._widget = None
         self._prevbg = None
 
+    def icon(self, widget):
+        icon = self._get(widget, "icon", None)
+        if icon is None:
+            return self._get(widget, "prefix", None)
+
+    def get(self, widget, attribute, default_value=""):
+        return self._get(widget, attribute, default_value)
+
     def padding(self, widget):
         """Return padding for widget"""
         return self._get(widget, "padding", "")
@@ -106,6 +117,9 @@ class Theme(object):
         padding = self.padding(widget)
         pre = self._get(widget, "prefix", None)
         return u"{}{}{}".format(padding, pre, padding) if pre else default
+
+    def symbol(self, widget, name, default=None):
+        return self._get(widget, name, default)
 
     def suffix(self, widget, default=None):
         """Return the theme suffix for a widget's full text"""
@@ -157,8 +171,11 @@ class Theme(object):
 
     def _load_colors(self, name):
         """Load colors for a theme"""
-        if name == "wal":
-            return self._load_wal_colors()
+        try:
+            if name == "wal":
+                return self._load_wal_colors()
+        except Exception as e:
+            logging.error("failed to load colors: {}".format(str(e)))
 
     def _load_icons(self, name):
         """Load icons for a theme"""
@@ -178,6 +195,14 @@ class Theme(object):
     def load(self, name, path=theme_path()):
         """Load and parse a theme file"""
         result = None
+
+        full_name = os.path.expanduser(name)
+        if os.path.isfile(full_name):
+            path = os.path.dirname(full_name)
+            name = os.path.basename(full_name)
+            name,_,_ = name.rpartition(".json")
+            return self.load(name, path)
+
         if not isinstance(path, list):
             path = [path]
         for p in path:
@@ -201,6 +226,9 @@ class Theme(object):
         if not self._widget:
             self._widget = widget
 
+        if self._widget.get("theme.exclude", "") == name:
+            return None
+
         if self._widget != widget:
             self._prevbg = self.bg(self._widget)
             self._widget = widget
@@ -216,7 +244,8 @@ class Theme(object):
         states = widget.state()
         if name not in states:
             for state in states:
-                state_themes.append(self._get(widget, state, {}))
+                if state:
+                    state_themes.append(self._get(widget, state, {}))
 
         value = self._defaults.get(name, default)
         value = widget.get("theme.{}".format(name), value)

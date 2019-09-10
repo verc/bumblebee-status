@@ -1,5 +1,7 @@
 """Pop-up menus."""
 
+import logging
+
 try:
     import Tkinter as tk
 except ImportError:
@@ -7,9 +9,7 @@ except ImportError:
     try:
         import tkinter as tk
     except ImportError:
-        pass
-
-import logging
+        logging.warning("failed to import tkinter - bumblebee popups won't work!")
 
 class PopupMenu:
     """The popup-menu."""
@@ -43,7 +43,7 @@ class PopupMenu:
         if callback is None:
             callback = click_callback
         self.menu.add_command(label=menuitem,
-                              command=click_callback)
+                              command=callback)
 
         # track item index
         self._item_count += 1

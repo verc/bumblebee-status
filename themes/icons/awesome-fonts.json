@@ -1,130 +1,182 @@
 {
-	"defaults": {
-		"separator": "", "padding": " ",
-		"unknown": { "prefix": "" }
-	},
-	"date": { "prefix": ""	},
-	"time": { "prefix": "" },
-	"datetime": { "prefix": "" },
-	"memory": { "prefix": "" },
-	"cpu": { "prefix": "" },
-	"disk": { "prefix": "" },
-	"dnf": { "prefix": "" },
-	"pacman": { "prefix": "" },
-	"brightness": { "prefix": "" },
-	"load": { "prefix": "" },
-	"layout": { "prefix": "" },
-	"layout-xkb": { "prefix": "" },
-	"todo": { "empty": {"prefix": "" },
-	"items": {"prefix": "" },
-	"uptime": {"prefix": "" }
-	},
-	"zpool": {
-		"poolread": {"prefix": "→ "},
-		"poolwrite": {"prefix": "← "},
-		"ONLINE": {"prefix": ""},
-		"FAULTED": {"prefix": "!"},
-		"DEGRADED": {"prefix": "!"}
-	},
-	"cmus": {
-		"playing": { "prefix": "" },
-		"paused": { "prefix": "" },
-		"stopped": { "prefix": "" },
-		"prev": { "prefix": "" },
-		"next": { "prefix": "" },
-		"shuffle-on": { "prefix": "" },
-		"shuffle-off": { "prefix": "" },
-		"repeat-on": { "prefix": "" },
-		"repeat-off": { "prefix": "" }
-	},
-	"gpmdp": {
-		"playing": { "prefix": "" },
-		"paused": { "prefix": "" },
-		"stopped": { "prefix": "" },
-		"prev": { "prefix": "" },
-		"next": { "prefix": "" }
-	},
-	"pasink": {
-		"muted": { "prefix": "" },
-		"unmuted": { "prefix": "" }
-	},
-	"amixer": {
-		"muted": { "prefix": "" },
-		"unmuted": { "prefix": "" }
-	},
-	"pasource": {
-		"muted": { "prefix": "" },
-		"unmuted": { "prefix": "" }
-	},
+  "defaults": {
+    "separator": "",
+    "padding": " ",
+    "unknown": { "prefix": "" }
+  },
+  "date": { "prefix": "" },
+  "time": { "prefix": "" },
+  "datetime": { "prefix": "" },
+  "datetz": { "prefix": "" },
+  "timetz": { "prefix": "" },
+  "datetimetz": { "prefix": "" },
+  "memory": { "prefix": "" },
+  "cpu": { "prefix": "" },
+  "disk": { "prefix": "" },
+  "dnf": { "prefix": "" },
+  "apt": { "prefix": "" },
+  "pacman": { "prefix": "" },
+  "brightness": { "prefix": "" },
+  "load": { "prefix": "" },
+  "layout": { "prefix": "" },
+  "layout-xkb": { "prefix": "" },
+  "notmuch_count": {
+    "empty": { "prefix": "\uf0e0" },
+    "items": { "prefix": "\uf0e0" }
+  },
+  "todo": {
+    "empty": { "prefix": "" },
+    "items": { "prefix": "" },
+    "uptime": { "prefix": "" }
+  },
+  "zpool": {
+    "poolread": { "prefix": "→ " },
+    "poolwrite": { "prefix": "← " },
+    "ONLINE": { "prefix": "" },
+    "FAULTED": { "prefix": "!" },
+    "DEGRADED": { "prefix": "!" }
+  },
+  "cmus": {
+    "playing": { "prefix": "" },
+    "paused": { "prefix": "" },
+    "stopped": { "prefix": "" },
+    "prev": { "prefix": "" },
+    "next": { "prefix": "" },
+    "shuffle-on": { "prefix": "" },
+    "shuffle-off": { "prefix": "" },
+    "repeat-on": { "prefix": "" },
+    "repeat-off": { "prefix": "" }
+  },
+  "gpmdp": {
+    "playing": { "prefix": "" },
+    "paused": { "prefix": "" },
+    "stopped": { "prefix": "" },
+    "prev": { "prefix": "" },
+    "next": { "prefix": "" }
+  },
+  "pasink": {
+    "muted": { "prefix": "" },
+    "unmuted": { "prefix": "" }
+  },
+  "amixer": {
+    "muted": { "prefix": "" },
+    "unmuted": { "prefix": "" }
+  },
+  "pasource": {
+    "muted": { "prefix": "" },
+    "unmuted": { "prefix": "" }
+  },
   "kernel": {
     "prefix": "\uf17c"
   },
-	"nic": {
-		"wireless-up": { "prefix": "" },
-		"wireless-down": { "prefix": "" },
-		"wired-up": { "prefix": "" },
-		"wired-down": { "prefix": "" },
-		"tunnel-up": { "prefix": "" },
-		"tunnel-down": { "prefix": "" }
-	},
-    "bluetooth": {
-        "ON": { "prefix": "" },
-        "OFF": { "prefix": "" },
-        "?": { "prefix": "" }
+  "nic": {
+    "wireless-up": { "prefix": "" },
+    "wireless-down": { "prefix": "" },
+    "wired-up": { "prefix": "" },
+    "wired-down": { "prefix": "" },
+    "tunnel-up": { "prefix": "" },
+    "tunnel-down": { "prefix": "" }
+  },
+  "bluetooth": {
+    "ON": { "prefix": "" },
+    "OFF": { "prefix": "" },
+    "?": { "prefix": "" }
+  },
+  "battery": {
+    "charged": { "prefix": "", "suffix": "" },
+    "AC": { "suffix": "" },
+    "charging": {
+      "prefix": ["", "", "", "", ""],
+      "suffix": ""
     },
-	"battery": {
-		"charged": { "prefix": "", "suffix": "" },
-		"AC": { "suffix": "" },
-		"charging": {
-			"prefix": [ "", "", "", "", "" ],
-			"suffix": ""
-		},
-		"discharging-10": { "prefix": "", "suffix": "" },
-		"discharging-25": { "prefix": "", "suffix": "" },
-		"discharging-50": { "prefix": "", "suffix": "" },
-		"discharging-80": { "prefix": "", "suffix": "" },
-		"discharging-100": { "prefix": "", "suffix": "" },
-		"unlimited": { "prefix": "", "suffix": "" },
-		"estimate": {	"prefix": ""  }
-	},
-	"caffeine": {
-		"activated": {"prefix": " " }, "deactivated": { "prefix": " " }
-	},
-	"xrandr": {
-		"on": { "prefix": " "}, "off": { "prefix": " " }
-	},
-	"redshift": {
-		"day": { "prefix": "" }, "night": { "prefix": "" }, "transition": { "prefix": "" }
-	},
+    "discharging-10": { "prefix": "", "suffix": "" },
+    "discharging-25": { "prefix": "", "suffix": "" },
+    "discharging-50": { "prefix": "", "suffix": "" },
+    "discharging-80": { "prefix": "", "suffix": "" },
+    "discharging-100": { "prefix": "", "suffix": "" },
+    "unlimited": { "prefix": "", "suffix": "" },
+    "estimate": { "prefix": "" },
+    "unknown-10": { "prefix": "", "suffix": "" },
+    "unknown-25": { "prefix": "", "suffix": "" },
+    "unknown-50": { "prefix": "", "suffix": "" },
+    "unknown-80": { "prefix": "", "suffix": "" },
+    "unknown-100": { "prefix": "", "suffix": "" }
+  },
+  "battery_all": {
+    "charged": { "prefix": "", "suffix": "" },
+    "AC": { "suffix": "" },
+    "charging": {
+      "prefix": ["", "", "", "", ""],
+      "suffix": ""
+    },
+    "discharging-10": { "prefix": "", "suffix": "" },
+    "discharging-25": { "prefix": "", "suffix": "" },
+    "discharging-50": { "prefix": "", "suffix": "" },
+    "discharging-80": { "prefix": "", "suffix": "" },
+    "discharging-100": { "prefix": "", "suffix": "" },
+    "unlimited": { "prefix": "", "suffix": "" },
+    "estimate": { "prefix": "" },
+    "unknown-10": { "prefix": "", "suffix": "" },
+    "unknown-25": { "prefix": "", "suffix": "" },
+    "unknown-50": { "prefix": "", "suffix": "" },
+    "unknown-80": { "prefix": "", "suffix": "" },
+    "unknown-100": { "prefix": "", "suffix": "" }
+  },
+  "caffeine": {
+    "activated": { "prefix": " " },
+    "deactivated": { "prefix": " " }
+  },
+  "xrandr": {
+    "on": { "prefix": " " },
+    "off": { "prefix": " " },
+    "refresh": { "prefix": "" }
+  },
+  "redshift": {
+    "day": { "prefix": "" },
+    "night": { "prefix": "" },
+    "transition": { "prefix": "" }
+  },
+  "docker_ps": {
+    "prefix": ""
+  },
   "sensors": {
     "prefix": ""
   },
-  "traffic":{
-	  "rx": { "prefix": "" },
-	  "tx": { "prefix": "" }
+  "sensors2": {
+    "temp": { "prefix": "" },
+    "fan": { "prefix": "" },
+    "cpu": { "prefix": "" }
+  },
+  "traffic": {
+    "rx": { "prefix": "" },
+    "tx": { "prefix": "" }
+  },
+  "network_traffic": {
+    "rx": { "prefix": "" },
+    "tx": { "prefix": "" }
   },
   "mpd": {
-		"playing": { "prefix": "" },
-		"paused": { "prefix": "" },
-		"stopped": { "prefix": "" },
-		"prev": { "prefix": "" },
-		"next": { "prefix": "" },
-		"shuffle-on": { "prefix": "" },
-		"shuffle-off": { "prefix": "" },
-		"repeat-on": { "prefix": "" },
-		"repeat-off": { "prefix": "" }
-	},
-  "github": {
-	  "prefix": "  "
+    "playing": { "prefix": "" },
+    "paused": { "prefix": "" },
+    "stopped": { "prefix": "" },
+    "prev": { "prefix": "" },
+    "next": { "prefix": "" },
+    "shuffle-on": { "prefix": "" },
+    "shuffle-off": { "prefix": "" },
+    "repeat-on": { "prefix": "" },
+    "repeat-off": { "prefix": "" }
   },
-  "hipchat": {
-	  "prefix": "  "
+  "arch-update": {
+    "prefix": " "
+  },
+  "github": {
+    "prefix": "  "
   },
   "spotify": {
-	  "prefix": "  "
+    "prefix": "  "
   },
   "publicip": {
-	  "prefix": "  "
+    "prefix": "  "
   },
   "weather": {
     "clouds": { "prefix": "" },
@@ -134,6 +186,41 @@
     "thunder": { "prefix": "" }
   },
   "taskwarrior": {
-      "prefix": "  "
+    "prefix": "  "
+  },
+  "progress": {
+    "copying": {
+      "prefix": ""
+    }
+  },
+  "git": {
+    "main": { "prefix": "" },
+    "new": { "prefix": "" },
+    "modified": { "prefix": "" },
+    "deleted": { "prefix": "" }
+  },
+  "dunst": {
+    "muted": { "prefix": "" },
+    "unmuted": { "prefix": "" }
+  },
+  "twmn": {
+    "muted": { "prefix": "" },
+    "unmuted": { "prefix": "" }
+  },
+  "pihole": {
+    "enabled": { "prefix": "" },
+    "disabled": { "prefix": "" }
+  },
+  "vpn": {
+    "prefix": ""
+  },
+  "system": {
+    "prefix": "    "
+  },
+  "sun": {
+    "prefix": ""
+  },
+  "rss": {
+    "prefix": ""
   }
 }

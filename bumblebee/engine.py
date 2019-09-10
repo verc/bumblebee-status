@@ -25,7 +25,7 @@ def all_modules():
             "name": mod
         })
     return result
-
+  
 class Module(object):
     """Module instance base class
 
@@ -41,6 +41,7 @@ class Module(object):
         self.error = None
         self._next = int(time.time())
         self._default_interval = 0
+        self._engine = engine
 
         self._configFile = None
         for cfg in [os.path.expanduser("~/.bumblebee-status.conf"), os.path.expanduser("~/.config/bumblebee-status.conf")]:
@@ -56,8 +57,13 @@ class Module(object):
         if widgets:
             self._widgets = widgets if isinstance(widgets, list) else [widgets]
 
-    def widgets(self):
+    def theme(self):
+        return self._engine.theme()
+
+    def widgets(self, widgets=None):
         """Return the widgets to draw for this module"""
+        if widgets:
+            self._widgets = widgets if isinstance(widgets, list) else [widgets]
         return self._widgets
 
     def hidden(self):
@@ -110,12 +116,9 @@ class Module(object):
         """Return the config parameter 'name' for this module"""
         name = "{}.{}".format(self.name, name)
         value = self._config["config"].get(name, default)
-        log.debug("command line parameter {}={}".format(name, str(value)))
         if value == default:
             try:
-                log.debug("trying to read {} from configuration file".format(name))
                 value = self._configFile.get("module-parameters", name)
-                log.debug("configuration file {}={}".format(name, str(value)))
             except:
                 pass
         return value
@@ -133,15 +136,16 @@ class Engine(object):
     This class connects input/output, instantiates all
     required modules and drives the "event loop"
     """
-    def __init__(self, config, output=None, inp=None):
+    def __init__(self, config, output=None, inp=None, theme=None):
         self._output = output
         self._config = config
         self._running = True
         self._modules = []
         self.input = inp
-        self._aliases = self._read_aliases()
+        self._aliases = self._aliases()
         self.load_modules(config.modules())
         self._current_module = None
+        self._theme = theme
 
         if bumblebee.util.asbool(config.get("engine.workspacewheel", "true")):
             if bumblebee.util.asbool(config.get("engine.workspacewrap", "true")):
@@ -154,8 +158,21 @@ class Engine(object):
                     cmd=self._prev_workspace)
                 self.input.register_callback(None, bumblebee.input.WHEEL_DOWN,
                     cmd=self._next_workspace)
+        if bumblebee.util.asbool(config.get("engine.collapsible", "true")):
+            self.input.register_callback(None, bumblebee.input.MIDDLE_MOUSE,
+                cmd=self._toggle_minimize)
 
         self.input.start()
+
+    def theme(self):
+        return self._theme
+
+    def _toggle_minimize(self, event):
+        for module in self._modules:
+            widget = module.widget_by_id(event["instance"])
+            if widget:
+                log.debug("module {} found - toggle minimize".format(module.id))
+                widget.toggle_minimize()
 
     def _prev_workspace(self, event):
         self._change_workspace(-1)
@@ -213,13 +230,16 @@ class Engine(object):
                 self.input.register_callback(obj=module,
                     button=button["id"], cmd=module.parameter(button["name"]))
 
-    def _read_aliases(self):
-        result = {}
-        for module in all_modules():
-            mod = importlib.import_module("bumblebee.modules.{}".format(module["name"]))
-            for alias in getattr(mod, "ALIASES", []):
-                result[alias] = module["name"]
-        return result
+    def _aliases(self):
+        return {
+            'date': 'datetime',
+            'time': 'datetime',
+            'datetz': 'datetimetz',
+            'timetz': 'datetimetz',
+            'pasink': 'pulseaudio',
+            'pasource': 'pulseaudio',
+            'test-alias': 'test',
+        }
 
     def _load_module(self, module_name, config_name=None):
         """Load specified module and return it as object"""
@@ -228,10 +248,14 @@ class Engine(object):
             module_name = self._aliases[module_name]
         if config_name is None:
             config_name = module_name
+        err = None
         try:
             module = importlib.import_module("bumblebee.modules.{}".format(module_name))
         except ImportError as error:
-            raise bumblebee.error.ModuleLoadError(error)
+            err = error
+            log.fatal("failed to import {}: {}".format(module_name, str(error)))
+        if err:
+            raise bumblebee.error.ModuleLoadError("unable to load module {}: {}".format(module_name, str(err)))
         return getattr(module, "Module")(self, {
             "name": config_name,
             "config": self._config
@@ -252,22 +276,25 @@ class Engine(object):
         """Start the event loop"""
         self._output.start()
         while self.running():
-            self._output.begin()
-            for module in self._modules:
-                self._current_module = module
-                module.update_wrapper(module.widgets())
-                if module.error == None:
-                    for widget in module.widgets():
-                        widget.link_module(module)
-                        self._output.draw(widget=widget, module=module, engine=self)
-                else:
-                    self._output.draw(widget=module.errorWidget(), module=module, engine=self)
-            self._output.flush()
-            self._output.end()
+            self.write_output()
             if self.running():
                 self.input.wait(float(self._config.get("interval", 1)))
 
         self._output.stop()
         self.input.stop()
+
+    def write_output(self):
+        self._output.begin()
+        for module in self._modules:
+            self._current_module = module
+            module.update_wrapper(module.widgets())
+            if module.error is None:
+                for widget in module.widgets():
+                    widget.link_module(module)
+                    self._output.draw(widget=widget, module=module, engine=self)
+            else:
+                self._output.draw(widget=module.errorWidget(), module=module, engine=self)
+        self._output.flush()
+        self._output.end()
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

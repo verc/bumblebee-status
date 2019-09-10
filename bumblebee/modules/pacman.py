@@ -1,6 +1,9 @@
 # pylint: disable=C0111,R0903
 
-"""Displays update information per repository for pacman."
+"""Displays update information per repository for pacman.
+
+Parameters:
+    * pacman.sum: If you prefere displaying updates with a single digit (defaults to "False")
 
 Requires the following executables:
     * fakeroot
@@ -10,6 +13,7 @@ Requires the following executables:
 import os
 import threading
 
+import bumblebee.util
 import bumblebee.input
 import bumblebee.output
 import bumblebee.engine
@@ -47,6 +51,8 @@ class Module(bumblebee.engine.Module):
         self._count = 0
 
     def updates(self, widget):
+        if bumblebee.util.asbool(self.parameter("sum")):
+            return str(sum(map(lambda x: widget.get(x, 0), repos)))
         return '/'.join(map(lambda x: str(widget.get(x, 0)), repos))
 
     def update(self, widgets):

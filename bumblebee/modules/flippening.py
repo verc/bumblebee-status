@@ -48,5 +48,5 @@ class Module(bumblebee.engine.Module):
             else:
               ratio = 100. * float(eth['market_cap_usd']) / float(btc['market_cap_usd'])
               icon = ['🌑','🌒','🌓','🌔','🌕'][min(int(ratio)/25,4)]
-              self.text = "Ξ %.2f Ƀ %.2f %s %.2f%%" % (float(eth['price_usd']),float(btc['price_usd']),icon,ratio)
+              self.text = "Ξ %.2f ₿ %.2f %s %.2f%%" % (float(eth['price_usd']),float(btc['price_usd']),icon,ratio)
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

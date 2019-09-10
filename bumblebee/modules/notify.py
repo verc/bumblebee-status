@@ -50,7 +50,7 @@ class Module(bumblebee.engine.Module):
     def update(self, widgets):
       if self._nextcheck < int(time.time()):
         self._nextcheck = int(time.time()) + 300
-        upd, sec = map(int,subprocess.Popen("/usr/lib/update-notifier/apt-check 2>&1",
+        upd, sec = map(int,subprocess.Popen("/usr/lib/update-notifier/apt_check.py 2>&1",
                                             shell=True, stdout=subprocess.PIPE).stdout.read().split(';'))
         self.text = '◯'
         if upd > 0:
