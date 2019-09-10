@@ -36,9 +36,6 @@ class Module(bumblebee.engine.Module):
             for group_id, group in self.bridge.get_group().items():
               if group['name'] == self.parameter("group", ""):
                 break
-            for scene in self.bridge.scenes:
-              if scene.name == self.parameter("scene", "Concentrate"):
-                break
             break
           except:
             self.text = "error: could not connect to bridge at: " + self.parameter("bridge", "")
@@ -48,14 +45,10 @@ class Module(bumblebee.engine.Module):
           self.text = "error: unknown group: " + self.parameter("group", "")
           return
 
-        if scene.name != self.parameter("scene", "Concentrate"):
-          self.text = "error: unknown scene: " + self.parameter("scene", "Concentrate")
-          return
-
         i3.Subscription(self.i3sub, 'workspace')
 
         self.group = Group(self.bridge, int(group_id))
-        self.scene = scene
+        self.scene_idx = -1
         self.brightness = self.group.brightness - self.group.brightness % 5
         self.original_brightness = self.group.brightness
         self.modify_brightness = False
@@ -94,7 +87,8 @@ class Module(bumblebee.engine.Module):
       self._statecheck = int(time.time()) + 1
 
     def middle(self, e=None):
-      self.bridge.activate_scene(self.group.group_id, self.scene.scene_id)
+      self.bridge.activate_scene(self.group.group_id, self.bridge.scenes[self.scene_idx].scene_id)
+      self.scene_idx = (self.scene_idx + 1) % len(self.bridge.scenes)
 
     def increase_brightness(self, e=None):
       if self.brightness >= 255: return
