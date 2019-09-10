@@ -27,7 +27,7 @@ class Module(bumblebee.engine.Module):
         super(Module, self).__init__(engine, config,
             bumblebee.output.Widget(full_text=self.make)
         )
-        self._curprice = ""
+        self.text = ""
         self._nextcheck = 0
         self._interval = int(self.parameter("interval", "30"))
 
@@ -47,6 +47,6 @@ class Module(bumblebee.engine.Module):
               self.text = "unable to update prices"
             else:
               ratio = 100. * float(eth['market_cap_usd']) / float(btc['market_cap_usd'])
-              icon = ['🌑','🌒','🌓','🌔','🌕'][min(int(ratio)/25,4)]
+              icon = ['🌑','🌒','🌓','🌔','🌕'][min(int(ratio)//25,4)]
               self.text = "Ξ %.2f ₿ %.2f %s %.2f%%" % (float(eth['price_usd']),float(btc['price_usd']),icon,ratio)
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

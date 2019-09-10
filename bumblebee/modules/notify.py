@@ -51,7 +51,7 @@ class Module(bumblebee.engine.Module):
       if self._nextcheck < int(time.time()):
         self._nextcheck = int(time.time()) + 300
         upd, sec = map(int,subprocess.Popen("/usr/lib/update-notifier/apt_check.py 2>&1",
-                                            shell=True, stdout=subprocess.PIPE).stdout.read().split(';'))
+                                            shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').split(';'))
         self.text = '◯'
         if upd > 0:
           self.text = u"\u25CF"
