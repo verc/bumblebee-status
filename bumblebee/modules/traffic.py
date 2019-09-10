@@ -104,7 +104,7 @@ class Module(bumblebee.engine.Module):
                 prev = self._prev.get(name, 0)
                 speed = bumblebee.util.bytefmt((int(data[direction]) - int(prev))/timediff)
                 txtspeed ='{0}/s'.format(speed)
-                widget.full_text(txtspeed) 
+                widget.full_text(txtspeed)
                 self._prev[name] = data[direction]
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
