@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""i3 notification widgeth2
+"""i3 notification widget
 
 Requires the following python packages:
     * python-i3
@@ -49,7 +49,7 @@ class Module(bumblebee.engine.Module):
 
     def update(self, widgets):
       if self._nextcheck < int(time.time()):
-        self._nextcheck = int(time.time()) + 600
+        self._nextcheck = int(time.time()) + 300
         upd, sec = map(int,subprocess.Popen("/usr/lib/update-notifier/apt-check 2>&1",
                                             shell=True, stdout=subprocess.PIPE).stdout.read().split(';'))
         self.text = '◯'
