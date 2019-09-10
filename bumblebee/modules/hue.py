@@ -33,8 +33,11 @@ class Module(bumblebee.engine.Module):
           try:
             self.bridge = Bridge(self.parameter("bridge", ""))
             self.bridge.connect()
-            for id, group in self.bridge.get_group().items():
+            for group_id, group in self.bridge.get_group().items():
               if group['name'] == self.parameter("group", ""):
+                break
+            for scene in self.bridge.scenes:
+              if scene.name == self.parameter("scene", "Concentrate"):
                 break
             break
           except:
@@ -45,9 +48,14 @@ class Module(bumblebee.engine.Module):
           self.text = "error: unknown group: " + self.parameter("group", "")
           return
 
+        if scene.name != self.parameter("scene", "Concentrate"):
+          self.text = "error: unknown scene: " + self.parameter("scene", "Concentrate")
+          return
+
         i3.Subscription(self.i3sub, 'workspace')
 
-        self.group = Group(self.bridge, int(id))
+        self.group = Group(self.bridge, int(group_id))
+        self.scene = scene
         self.brightness = self.group.brightness - self.group.brightness % 5
         self.original_brightness = self.group.brightness
         self.modify_brightness = False
@@ -60,6 +68,8 @@ class Module(bumblebee.engine.Module):
 
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
             cmd=self.click)
+        engine.input.register_callback(self, button=bumblebee.input.MIDDLE_MOUSE,
+                                       cmd=self.middle)
         engine.input.register_callback(self, button=bumblebee.input.RIGHT_MOUSE,
                                        cmd=self.parameter("action", "luminance"))
         engine.input.register_callback(self, button=bumblebee.input.WHEEL_UP,
@@ -82,6 +92,9 @@ class Module(bumblebee.engine.Module):
     def click(self, e=None):
       self.group.on = self.on = not self.group.on
       self._statecheck = int(time.time()) + 1
+
+    def middle(self, e=None):
+      self.bridge.activate_scene(self.group.group_id, self.scene.scene_id)
 
     def increase_brightness(self, e=None):
       if self.brightness >= 255: return
